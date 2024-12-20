@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from core.getCurrentUser import get_current_user
 from simple_history.models import HistoricalRecords
+from django.core.exceptions import ValidationError
 
 class UnitofMeasurement(models.Model):
     id = models.BigAutoField(primary_key=True, db_index=True)
@@ -11,14 +12,18 @@ class UnitofMeasurement(models.Model):
     active = models.BooleanField(default=True, verbose_name='Active')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Created At')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Updated At')
-    add_by=models.ForeignKey(User,blank=True,null=True,default=get_current_user,on_delete=models.PROTECT,related_name="un_add")
-    history = HistoricalRecords() 
-   
+    add_by = models.ForeignKey(User, blank=True, null=True, default=get_current_user, on_delete=models.PROTECT, related_name="un_add")
+    history = HistoricalRecords()
+
     class Meta:
         verbose_name = "Unit of Measurement"
 
     def __str__(self):
         return self.name
+
+    def clean(self):
+        if self.conversion_to_kg <= 0:
+            raise ValidationError({"conversion_to_kg": "Conversion to Kilogram must be greater than 0."})
 
 
 class UnitofMeasurementLength(models.Model):
@@ -29,14 +34,18 @@ class UnitofMeasurementLength(models.Model):
     active = models.BooleanField(default=True, verbose_name='Active')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Created At')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Updated At')
-    added_by=models.ForeignKey(User,blank=True,null=True,default=get_current_user,on_delete=models.PROTECT,related_name="unl_add")
-    history = HistoricalRecords() 
-    
+    added_by = models.ForeignKey(User, blank=True, null=True, default=get_current_user, on_delete=models.PROTECT, related_name="unl_add")
+    history = HistoricalRecords()
+
     class Meta:
         verbose_name = "Unit of Measurement (Length)"
 
     def __str__(self):
         return self.name
+
+    def clean(self):
+        if self.conversion_to_cm <= 0:
+            raise ValidationError({"conversion_to_cm": "Conversion to Centi Meters must be greater than 0."})
 
 
 class Ports(models.Model):
@@ -56,14 +65,18 @@ class Ports(models.Model):
     active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Created At')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Updated At')
-    added_by=models.ForeignKey(User,blank=True,null=True,default=get_current_user,on_delete=models.PROTECT)
-    history = HistoricalRecords() 
+    added_by = models.ForeignKey(User, blank=True, null=True, default=get_current_user, on_delete=models.PROTECT)
+    history = HistoricalRecords()
 
     class Meta:
         verbose_name = "Ports"
 
     def __str__(self):
         return self.name
+
+    def clean(self):
+        if not any([self.is_land, self.is_air, self.is_sea]):
+            raise ValidationError("At least one of Land, Air, or Sea must be selected.")
 
 
 class PackageType(models.Model):
@@ -74,18 +87,22 @@ class PackageType(models.Model):
     breadth = models.DecimalField(verbose_name="Breadth", decimal_places=2, max_digits=10)
     width = models.DecimalField(verbose_name="Width", decimal_places=2, max_digits=10)
     length_unit = models.ForeignKey(UnitofMeasurementLength, on_delete=models.CASCADE, related_name='package_length_unit')
-    container_type=models.CharField(choices=[("LCL","LCL"),("FCL","FCL")],max_length=5)
+    container_type = models.CharField(choices=[("LCL", "LCL"), ("FCL", "FCL")], max_length=5)
     active = models.BooleanField(default=True, verbose_name='Active')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Created At')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Updated At')
-    added_by=models.ForeignKey(User,blank=True,null=True,default=get_current_user,on_delete=models.PROTECT)
-    history = HistoricalRecords() 
-    
+    added_by = models.ForeignKey(User, blank=True, null=True, default=get_current_user, on_delete=models.PROTECT)
+    history = HistoricalRecords()
+
     class Meta:
         verbose_name = "Package Type"
 
     def __str__(self):
         return self.name
+
+    def clean(self):
+        if self.length <= 0 or self.breadth <= 0 or self.width <= 0:
+            raise ValidationError("Length, Breadth, and Width must all be greater than 0.")
 
 class Branch(models.Model):
     BRANCH_STATUS_CHOICES = [
@@ -134,6 +151,8 @@ MASTER_DATA_TYPE=[
     ("CONTAINER_TYPE","CONTAINER_TYPE"),
     ("CARGO_TYPE","CARGO_TYPE"),
     ("TRAILER_TYPE","TRAILER_TYPE"),
+    ("DELIVERY_TYPE","DELIVERY_TYPE"),
+    ("ShipmenSubType","ShipmenSubTyp"),
     ("INCO","INCO"),
 ]
 
@@ -142,6 +161,44 @@ class MasterData(models.Model):
     type_master=models.CharField(choices=MASTER_DATA_TYPE,max_length=100)
     name=models.CharField(max_length=100)
     history = HistoricalRecords() 
+
+
+
+class ApplicationSettings(models.Model):
+    name = models.CharField(max_length=255)
+    logo = models.ImageField(upload_to='logos/')
+    country = models.CharField(max_length=100)
+    state = models.CharField(max_length=100, blank=True, null=True)
+    address = models.TextField()
+    bank_details = models.TextField()
+    accounting_details = models.TextField()
+    financial_period_start = models.DateField()
+    financial_period_end = models.DateField()
+
+    def save(self, *args, **kwargs):
+        if not self.pk and ApplicationSettings.objects.exists():
+            raise ValidationError("Only one instance of this model is allowed.")
+        return super().save(*args, **kwargs)
+
+    class Meta:
+        verbose_name = "Singleton Setting"
+        verbose_name_plural = "Singleton Settings"
  
- 
- 
+class ShipmentPrefixes(models.Model):
+    shipment_prefix = models.CharField(max_length=20, default='SHIP')
+    journal_voucher_prefix = models.CharField(max_length=20, default='JV')
+    cash_transfer_prefix = models.CharField(max_length=20, default='CT')
+    packages_prefix = models.CharField(max_length=20, default='PKG')
+    bill_prefix = models.CharField(max_length=20, default='BILL')
+    invoice_prefix = models.CharField(max_length=20, default='INV')
+    credit_note_prefix = models.CharField(max_length=20, default='CN')
+    cheque_prefix = models.CharField(max_length=20, default='CHQ')
+
+    def save(self, *args, **kwargs):
+        if not self.pk and ShipmentPrefixes.objects.exists():
+            raise ValidationError("Only one instance of this model is allowed.")
+        return super().save(*args, **kwargs)
+
+    class Meta:
+        verbose_name = "Shipment Prefixes"
+        verbose_name_plural = "Shipment Prefixes"
