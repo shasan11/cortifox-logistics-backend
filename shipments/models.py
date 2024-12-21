@@ -395,13 +395,14 @@ class PickupDelivery(models.Model):
     created = models.DateTimeField(auto_now_add=True, verbose_name="Created On")
     updated = models.DateTimeField(auto_now=True, verbose_name="Last Updated")
     user_add = models.ForeignKey(
-        "User", on_delete=models.PROTECT, editable=False, null=True, default=get_current_user, related_name="shipments_user_pickup_delivery"
+        User, on_delete=models.PROTECT, editable=False, null=True, default=get_current_user, related_name="pc_user_pickup_delivery"
     )
     active = models.BooleanField(default=True, verbose_name="Active Status")
     history = HistoricalRecords()
     
     def __str__(self):
         return f"{self.shipment} - {self.type_leg} - {self.status}"
+
 class ShipmentCharges(models.Model):
     id = models.BigAutoField(primary_key=True)
     shipment = models.ForeignKey(Shipment, on_delete=models.CASCADE, related_name="shipment_charges")

@@ -51,7 +51,7 @@ class Costing(models.Model):
     updated=models.DateTimeField(auto_now=True)
     user_add=models.ForeignKey(User,on_delete=models.PROTECT,editable=False,null=True,default=get_current_user)
     active=models.BooleanField(default=True)
-    user=models.ForeignKey(User,on_delete=models.PROTECT,related_name='invoice_user',blank=True,null=True)
+    user=models.ForeignKey(User,on_delete=models.PROTECT,related_name='shipment_costing_user',blank=True,null=True)
 
 
 class VendorPayment(models.Model):

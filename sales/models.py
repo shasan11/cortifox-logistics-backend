@@ -64,7 +64,7 @@ class CustomerPayments(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     history = HistoricalRecords()
-    user=models.ForeignKey(User,on_delete=models.PROTECT,related_name='invoice_user',blank=True,null=True)
+    user=models.ForeignKey(User,on_delete=models.PROTECT,related_name='customer_payment_user',blank=True,null=True)
 
     class Meta:
         ordering = ['-payment_date']
@@ -80,7 +80,7 @@ class CreditNote(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     history = HistoricalRecords()
-    user=models.ForeignKey(User,on_delete=models.PROTECT,related_name='invoice_user',blank=True,null=True) 
+    user=models.ForeignKey(User,on_delete=models.PROTECT,related_name='credit_user',blank=True,null=True) 
 
     class Meta:
         ordering = ['-created']

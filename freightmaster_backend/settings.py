@@ -20,6 +20,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+     'image_uploader_widget',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

@@ -56,7 +56,7 @@ class ASNFilter(filters.FilterSet):
 
     class Meta:
         model = ASN
-        fields = ['asn_no', 'warehouse', 'is_received', 'is_issued', 'is_delivered']
+        fields = ['asn_no', 'warehouse_orders', 'is_received', 'is_issued', 'is_delivered']
 
 
 class GoodsRecieptNoteFilter(filters.FilterSet):
@@ -64,7 +64,7 @@ class GoodsRecieptNoteFilter(filters.FilterSet):
 
     class Meta:
         model = GoodsRecieptNote
-        fields = ['warehouse', 'active']
+        fields = ['warehouse_orders', 'active']
 
 
 class GoodsIssueOrderFilter(filters.FilterSet):
@@ -72,7 +72,7 @@ class GoodsIssueOrderFilter(filters.FilterSet):
 
     class Meta:
         model = GoodsIssueOrder
-        fields = ['warehouse', 'active']
+        fields = ['warehouse_orders', 'active']
 
 
 class GoodsDispatchOrderFilter(filters.FilterSet):
@@ -80,7 +80,7 @@ class GoodsDispatchOrderFilter(filters.FilterSet):
 
     class Meta:
         model = GoodsDispatchOrder
-        fields = ['warehouse', 'active']
+        fields = ['warehouse_orders', 'active']
 
 
 class StockTransferFilter(filters.FilterSet):

@@ -2,7 +2,7 @@ from django.db.models.signals import pre_save, post_save, post_delete
 from django.dispatch import receiver
 from django.db import transaction, models
 from decimal import Decimal
-from .models import CashTransfers, JournalEntry, ChequeRegister, BankAccounts, Currency, JournalEntryItems, ChartOfAccounts
+from .models import CashTransfers, JournalEntry, ChequeRegister, BankAccounts, Currency, JournalEntryItems, ChartofAccounts
 from master.models import ShipmentPrefixes
 import logging
 

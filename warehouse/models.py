@@ -145,15 +145,15 @@ class WarehouseJobsOrders(models.Model):
     from_warehouse_bin = models.ForeignKey(WarehouseBin, on_delete=models.CASCADE, related_name='warehouse_order_stock_transfers_from_bins', verbose_name="From Warehouse Bin")
     to_warehouse_bin = models.ForeignKey(WarehouseBin, on_delete=models.CASCADE, related_name='warehouse_order_stock_transfers_to_bins', verbose_name="To Warehouse Bin")
   
-    port_origin = models.ForeignKey(Ports, on_delete=models.PROTECT, related_name="shipments_port_origin")
-    port_handling_agent_origin = models.ForeignKey(Vendor, on_delete=models.PROTECT, related_name="shipments_port_handling_agent_origin")
+    port_origin = models.ForeignKey(Ports, on_delete=models.PROTECT, related_name="warehouse_order_port_origin")
+    port_handling_agent_origin = models.ForeignKey(Vendor, on_delete=models.PROTECT, related_name="warehouse_order_handling_agent_origin")
     eta_origin = models.DateField(null=True, blank=True, verbose_name="Estimated Time of Arrival")
     etd_origin = models.DateField(null=True, blank=True, verbose_name="Estimated Time of Departure")
     
 
     # Port destination info
-    port_destination = models.ForeignKey(Ports, on_delete=models.PROTECT, related_name="shipments_port_destination")
-    port_handling_agent_destination = models.ForeignKey(Vendor, on_delete=models.PROTECT, related_name="shipments_port_handling_agent_destination")
+    port_destination = models.ForeignKey(Ports, on_delete=models.PROTECT, related_name="warehouse_order_port_destination")
+    port_handling_agent_destination = models.ForeignKey(Vendor, on_delete=models.PROTECT, related_name="warehouse_orders_port_handling_agent_destination")
     eta_origin_destination = models.DateField(null=True, blank=True, verbose_name="Estimated Time of Arrival")
     etd_destination = models.DateField(null=True, blank=True, verbose_name="Estimated Time of Departure")
 
