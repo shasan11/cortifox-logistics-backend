@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'master',
     'shipments',
     'warehouse',
+    'sales',
+    'purchase',
 
     # Third-party apps
      
