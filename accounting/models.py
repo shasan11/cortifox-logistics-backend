@@ -93,7 +93,7 @@ class PaymentMethod(models.Model):
     id = models.AutoField(primary_key=True)
     uuid = models.UUIDField(unique=True, default=uuid.uuid4)
     name = models.CharField(max_length=50, unique=True)
-    desc = models.TextField(blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
     commission = models.DecimalField(max_digits=5, decimal_places=2,blank=True,null=True)   
     created=models.DateTimeField(auto_now_add=True)
     updated=models.DateTimeField(auto_now=True)
