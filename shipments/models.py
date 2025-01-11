@@ -128,33 +128,40 @@ class Shipment(models.Model):
     priority = models.CharField(max_length=100, choices=(("High", "High"), ("Low", "Low"), ("Medium", ("Medium"))))
     consignee = models.ForeignKey(RelatedConsignee, on_delete=models.PROTECT, related_name="consignees_related_shipment",blank=True,null=True)
     shipper= models.ForeignKey(Vendor, on_delete=models.PROTECT, related_name="shipper", blank=True, null=True)
-    
+    complementary=models.BooleanField(default=False)
     currency = models.ForeignKey(Currency, on_delete=models.PROTECT, related_name="shipments_currency")
     total_amount = models.FloatField(blank=True, null=True)
     paid_amount = models.FloatField(default=0, blank=True, null=True) 
     payment_type = models.CharField(max_length=50, choices=PAYMENT_CHOICES, default='prepaid', blank=True, null=True)
    
-    #ADDITIONAL INFOMRATION
-    customs_value = models.DecimalField(max_digits=10, decimal_places=2, default=0, blank=True, null=True)
-    freight_value = models.DecimalField(max_digits=10, decimal_places=2, default=0, blank=True, null=True)
-    insurance_value = models.DecimalField(max_digits=10, decimal_places=2, default=0, blank=True, null=True)
-    invoice_value = models.DecimalField(max_digits=10, decimal_places=2, default=0, blank=True, null=True)
+    customs_value = models.DecimalField(default=0, max_digits=10, decimal_places=2, blank=True, null=True)
+    freight_value = models.DecimalField(default=0, max_digits=10, decimal_places=2, blank=True, null=True)
+    insurance_value = models.DecimalField(default=0, max_digits=10, decimal_places=2, blank=True, null=True)
+    invoice_value = models.DecimalField(default=0, max_digits=10, decimal_places=2, blank=True, null=True)
 
     
     # Extras
     is_client_approved=models.BooleanField(default=False)
     has_warehouse_jobs=models.BooleanField(default=False)
     invoices = models.BooleanField(default=False)
-    is_dangerous_good = models.BooleanField(default=False)
+    is_dangerous_goods = models.BooleanField(default=False)
     is_damaged_goods = models.BooleanField(default=False)
-    packaing_list = models.BooleanField(default=False)
+    packaging_list = models.BooleanField(default=False)
     imo_number = models.CharField(blank=True, null=True, max_length=100)
     final_address = models.CharField(blank=True, null=True, max_length=100)
     order_no = models.CharField(blank=True, null=True, max_length=100)
     delivery_type = models.CharField(blank=True, null=True, max_length=100)
-    doc_ref_type = models.CharField(blank=True, null=True, max_length=100)
+    doc_ref_no = models.CharField(blank=True, null=True, max_length=100)
     declaration_no = models.CharField(blank=True, null=True, max_length=100)
     order_no = models.CharField(blank=True, null=True, max_length=100)
+
+
+    #Some Other
+    origin_custom_clearance=models.BooleanField(default=False)
+    destination_custom_clearance=models.BooleanField(default=False)
+    open_financially=models.BooleanField(default=True)
+    open_operationally=models.BooleanField(default=True)
+    manifest_si_no=models.CharField(max_length=120,blank=True,null=True)
 
     
     # Date And Time
@@ -184,6 +191,38 @@ class Shipment(models.Model):
     user_add = models.ForeignKey(User, on_delete=models.PROTECT, editable=False, null=True, default=get_current_user, related_name="shipments_user_add")
     active = models.BooleanField(default=True)    
     history = HistoricalRecords() 
+
+    #Booking Shipment Specifice Field
+    master= models.ForeignKey('self', related_name="subshipments", blank=True,null=True,on_delete=models.CASCADE)
+    is_loaded=models.BooleanField(default=False)
+    booking_status=models.CharField(max_length=100,blank=True,null=True)    
+
+
+
+     # Air freight specific
+    awb = models.CharField(max_length=50, blank=True, null=True)
+    flight_number = models.CharField(max_length=50, blank=True, null=True)
+    cargo_terminal = models.CharField(max_length=50, blank=True, null=True)
+    handling_code = models.CharField(max_length=50, blank=True, null=True)   
+    uld_no = models.CharField(max_length=50, blank=True, null=True)
+    
+    
+    # Sea freight specific
+    bol = models.CharField(max_length=50, blank=True, null=True)
+    vessel_name = models.CharField(max_length=50, blank=True, null=True)
+    voyage_number = models.CharField(max_length=50, blank=True, null=True)
+    container_number = models.CharField(max_length=50, blank=True, null=True)
+    container_type = models.CharField(max_length=50, blank=True, null=True)
+     
+    # Land freight specific 
+    bol_land = models.CharField(max_length=50, blank=True, null=True)
+    vehicle_number = models.CharField(max_length=50, blank=True, null=True)
+    driver_info = models.TextField(blank=True, null=True)
+    route = models.TextField(blank=True, null=True)
+    cargo_type = models.CharField(max_length=50, blank=True, null=True,)
+    trailer_type = models.CharField(max_length=50, blank=True, null=True,)
+    handling_info=models.TextField(blank=True,null=True)
+ 
 
     class Meta:
         verbose_name_plural = "Shipments"
@@ -241,11 +280,9 @@ class ShipmentPackages(models.Model):
 class Transit(models.Model):
     id = models.BigAutoField(primary_key=True)
     shipment = models.ForeignKey(Shipment, on_delete=models.CASCADE, related_name="transits")
-    type=models.CharField(max_length=100,choices=TRANSPORTATION_TYPE)
     transport_mode = models.CharField(choices=TRANSPORT_MEDIUM, max_length=50)
     poa = models.ForeignKey(Ports, on_delete=models.PROTECT, related_name="transit_poa")
     pod = models.ForeignKey(Ports, on_delete=models.PROTECT, related_name="transit_pod")
-    transportation_type=models.CharField(max_length=100)
     tracking_no=models.CharField(max_length=100,null=True,blank=True)
     port_handling_agent = models.ForeignKey(User, on_delete=models.PROTECT, related_name="transits_port_handling_agent")
     eta = models.DateField(null=True, blank=True, verbose_name="Estimated Time of Arrival")
@@ -260,14 +297,7 @@ class Transit(models.Model):
     awb = models.CharField(max_length=50, blank=True, null=True)
     flight_number = models.CharField(max_length=50, blank=True, null=True)
     cargo_terminal = models.CharField(max_length=50, blank=True, null=True)
-    handling_code = models.CharField(max_length=50, blank=True, null=True)
-
-
-
-    #Booking Shipment Specifice Field
-    master= models.ForeignKey('self', related_name="subshipments", blank=True,null=True,on_delete=models.CASCADE)
-    is_loaded=models.BooleanField(default=False)
-    booking_status=models.CharField(max_length=100,blank=True,null=True)     
+    handling_code = models.CharField(max_length=50, blank=True, null=True)   
     uld_no = models.CharField(max_length=50, blank=True, null=True)
     
     

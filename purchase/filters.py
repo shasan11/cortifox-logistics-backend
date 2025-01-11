@@ -42,7 +42,6 @@ class ExpenseFilter(django_filters.FilterSet):
             'bill_no': ['exact', 'icontains'],
             'currency': ['exact'],
             'date': ['exact', 'year__exact', 'month__exact', 'day__exact'],
-            'type': ['exact'],
             'subtotal': ['lt', 'lte', 'gt', 'gte'],
             'grand_total': ['lt', 'lte', 'gt', 'gte'],
         }

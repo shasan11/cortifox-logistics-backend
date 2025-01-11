@@ -42,7 +42,7 @@ class VendorSerializer(BulkSerializerMixin,serializers.ModelSerializer):
 class RelatedConsigneeSerializer(BulkSerializerMixin,serializers.ModelSerializer):
     class Meta:
         model = RelatedConsignee
-        fields = ['id', 'name']
+        fields = "__all__"
         list_serializer_class = AdaptedBulkListSerializer
 
 class ShipmentPackagesSerializer(BulkSerializerMixin,serializers.ModelSerializer):
@@ -79,8 +79,7 @@ class RelatedDocumentsSerializer(BulkSerializerMixin,serializers.ModelSerializer
         return None
 
 class ShipmentChargesSerializer(BulkSerializerMixin,serializers.ModelSerializer):
-    user_add = UserMinimalSerializer(read_only=True)
-
+ 
     class Meta:
         model = ShipmentCharges
         fields = '__all__'

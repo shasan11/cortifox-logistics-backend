@@ -16,4 +16,5 @@ urlpatterns = [
     path('sales/',include('sales.urls')),
     path('shipments/',include('shipments.urls')),
     path('warehouse/',include('warehouse.urls')),
+    path('docs-generator/',include('docsprovider.urls'))
 ]

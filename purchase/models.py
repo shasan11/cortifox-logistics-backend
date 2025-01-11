@@ -109,7 +109,6 @@ class Expense(models.Model):
     currency = models.ForeignKey(Currency, on_delete=models.CASCADE, related_name='expenses')
     exchange_rate_to_npr = models.DecimalField(max_digits=10, decimal_places=2, default=1)
     date = models.DateField()
-    type = models.CharField(max_length=20, choices=[('debit', 'Debit'), ('credit', 'Credit'), ('purchase', 'Purchase'), ("e", "Expense")])
     chart_of_accounts = models.ForeignKey(ChartofAccounts, on_delete=models.CASCADE, blank=True, null=True, related_name='expenses')
     bank_accounts = models.ForeignKey(BankAccounts, on_delete=models.CASCADE, blank=True, null=True, related_name='expenses')
     subtotal = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, editable=False)

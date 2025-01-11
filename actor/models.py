@@ -33,11 +33,11 @@ class Vendor(models.Model):
     image = models.ImageField(upload_to='vendor_images', blank=True, null=True)
     vendor_class = models.CharField(max_length=20, choices=VENDOR_CLASS_CHOICES)
     type = models.CharField(max_length=20, choices=TYPE_CHOICES)
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255,unique=True)
     account_head = models.ForeignKey(ChartofAccounts, on_delete=models.PROTECT)
     country_code = models.CharField(max_length=255)
-    phone = models.CharField(max_length=20)
-    email = models.EmailField()
+    phone = models.CharField(max_length=20,unique=True)
+    email = models.EmailField(unique=True)
     country = models.CharField(max_length=50)
     state = models.CharField(max_length=50)
     acc_no = models.CharField(max_length=50, blank=True, null=True)
@@ -116,8 +116,7 @@ class Vendor(models.Model):
             raise ValidationError({'bank_info': 'Bank information cannot exceed 500 characters.'})
 
         # Validate `user_add` (must be a valid user, default should be the current user)
-        if not self.user_add:
-            raise ValidationError({'user_add': 'User adding the vendor is required.'})
+    
 
         # Validate `user` (if provided)
         if self.user and not isinstance(self.user, User):

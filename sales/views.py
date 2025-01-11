@@ -8,7 +8,7 @@ class InvoiceViewSet(BulkModelViewSet):
     queryset = Invoice.objects.all()
     serializer_class = InvoiceSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
-    filterset_fields = ['status', 'client', 'currency', 'payment_status', 'created_date_editable']
+    filterset_fields = ['status', 'client', 'currency', 'created_date_editable']
     ordering_fields = ['created', 'updated_date', 'total_amount', 'paid_amount']
 
 class CustomerPaymentsViewSet(BulkModelViewSet):

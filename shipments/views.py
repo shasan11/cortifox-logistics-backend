@@ -5,6 +5,8 @@ from rest_framework import views
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.views import APIView
+from django_filters.rest_framework import DjangoFilterBackend
+
 from .models import (
     Shipment, ShipmentParty, ShipmentPackages, Transit, 
     PrePostLeg, RelatedDocuments, PickupDelivery, ShipmentCharges,Driver,Fleet
@@ -44,6 +46,8 @@ class ShipmentViewSet(BulkModelViewSet):
 class ShipmentPartyViewSet(BulkModelViewSet):
     queryset = ShipmentParty.objects.all()
     serializer_class = ShipmentPartySerializer
+    filter_backends = [DjangoFilterBackend]   
+    filterset_fields = ['shipment',]
 
     def get_queryset(self):
         queryset = ShipmentParty.objects.all()
@@ -55,6 +59,9 @@ class ShipmentPartyViewSet(BulkModelViewSet):
 class ShipmentPackagesViewSet(BulkModelViewSet):
     queryset = ShipmentPackages.objects.all()
     serializer_class = ShipmentPackagesSerializer
+    filter_backends = [DjangoFilterBackend]
+   
+    filterset_fields = ['shipment',]
 
     def get_queryset(self):
         queryset = ShipmentPackages.objects.all()
@@ -66,6 +73,8 @@ class ShipmentPackagesViewSet(BulkModelViewSet):
 class TransitViewSet(BulkModelViewSet):
     queryset = Transit.objects.all()
     serializer_class = TransitSerializer
+    filter_backends = [DjangoFilterBackend]   
+    filterset_fields = ['shipment',]
 
     @action(detail=True, methods=['get'])
     def legs(self, request, pk=None):
@@ -77,18 +86,29 @@ class TransitViewSet(BulkModelViewSet):
 class PrePostLegViewSet(BulkModelViewSet):
     queryset = PrePostLeg.objects.all()
     serializer_class = PrePostLegSerializer
+    filter_backends = [DjangoFilterBackend]   
+    filterset_fields = ['shipment',]
 
 class RelatedDocumentsViewSet(BulkModelViewSet):
     queryset = RelatedDocuments.objects.all()
     serializer_class = RelatedDocumentsSerializer
+    filter_backends = [DjangoFilterBackend]
+   
+    filterset_fields = ['shipment',]
 
 class PickupDeliveryViewSet(BulkModelViewSet):
     queryset = PickupDelivery.objects.all()
     serializer_class = PickupDeliverySerializer
+    filter_backends = [DjangoFilterBackend]   
+    filterset_fields = ['shipment',]
 
 class ShipmentChargesViewSet(BulkModelViewSet):
     queryset = ShipmentCharges.objects.all()
     serializer_class = ShipmentChargesSerializer
+    filter_backends = [DjangoFilterBackend]
+   
+    filterset_fields = ['shipment',]
+
 
 class DriverViewSet(BulkModelViewSet):
     queryset = Driver.objects.all()

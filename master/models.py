@@ -104,13 +104,21 @@ class PackageType(models.Model):
         if self.length <= 0 or self.breadth <= 0 or self.width <= 0:
             raise ValidationError("Length, Breadth, and Width must all be greater than 0.")
 
+
+def generate_custom_uuid():
+    last_shipment = Branch.objects.all().order_by('-id').first()
+    last_shipment_id = last_shipment.id if last_shipment else 0
+    unique_number = last_shipment_id + 300
+
+    return f"BRANCH-{unique_number:08d}"
+
 class Branch(models.Model):
     BRANCH_STATUS_CHOICES = [
         ('operational', 'Operational'),
         ('closed', 'Closed'),
         ('under_construction', 'Under Construction'),
     ]    
-    branch_id = models.CharField(max_length=20, unique=True, verbose_name='Branch ID')
+    branch_id = models.CharField(max_length=20, unique=True, verbose_name='Branch ID',blank=True,null=True,default=generate_custom_uuid)
     name = models.CharField(max_length=100, verbose_name='Branch Name')
     address = models.CharField(max_length=255, verbose_name='Address')
     city = models.CharField(max_length=100, verbose_name='City')
@@ -127,7 +135,7 @@ class Branch(models.Model):
     active = models.BooleanField(default=True, verbose_name='Active')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Created At')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Updated At')
-    incharges=models.ManyToManyField(User,related_name="company_branch_head")
+    incharges=models.ManyToManyField(User,related_name="company_branch_head",null=True,blank=True)
     added_by=models.ForeignKey(User,blank=True,null=True,default=get_current_user,on_delete=models.PROTECT)
     history = HistoricalRecords() 
 
@@ -160,20 +168,26 @@ class MasterData(models.Model):
     id=models.BigAutoField(primary_key=True)
     type_master=models.CharField(choices=MASTER_DATA_TYPE,max_length=100)
     name=models.CharField(max_length=100)
+    description=models.TextField(blank=True,null=True)
     history = HistoricalRecords() 
 
 
 
 class ApplicationSettings(models.Model):
-    name = models.CharField(max_length=255)
-    logo = models.ImageField(upload_to='logos/')
-    country = models.CharField(max_length=100)
-    state = models.CharField(max_length=100, blank=True, null=True)
-    address = models.TextField()
-    bank_details = models.TextField()
-    accounting_details = models.TextField()
-    financial_period_start = models.DateField()
-    financial_period_end = models.DateField()
+    name = models.CharField(max_length=255, default='My Logistics Company')
+    logo = models.ImageField(upload_to='logos/', default='logos/default_logo.png')
+    country = models.CharField(max_length=100, default='United States')
+    state = models.CharField(max_length=100, default='California', blank=True, null=True)
+    address = models.TextField(default='123 Logistics Blvd, Suite 101, San Francisco, CA, 94101')
+    bank_details = models.TextField(default='Bank: XYZ Bank, Account: 123456789, Branch: San Francisco')
+    accounting_details = models.TextField(default='Account type: Checking, Financial period: January - December')
+    financial_period_start = models.DateField(default='2025-01-01')
+    financial_period_end = models.DateField(default='2025-12-31')
+    phone = models.CharField(max_length=20, verbose_name="Phone", default='+1 800 555 1234')
+    email = models.EmailField(blank=True, null=True, verbose_name="Email", default='info@logisticscompany.com')
+    PAN = models.CharField(max_length=200, blank=True, null=True, verbose_name="PAN", default='ABCPQ1234D')
+
+
 
     def save(self, *args, **kwargs):
         if not self.pk and ApplicationSettings.objects.exists():
@@ -185,14 +199,14 @@ class ApplicationSettings(models.Model):
         verbose_name_plural = "Singleton Settings"
  
 class ShipmentPrefixes(models.Model):
-    shipment_prefix = models.CharField(max_length=20, default='SHIP')
-    journal_voucher_prefix = models.CharField(max_length=20, default='JV')
-    cash_transfer_prefix = models.CharField(max_length=20, default='CT')
-    packages_prefix = models.CharField(max_length=20, default='PKG')
-    bill_prefix = models.CharField(max_length=20, default='BILL')
-    invoice_prefix = models.CharField(max_length=20, default='INV')
-    credit_note_prefix = models.CharField(max_length=20, default='CN')
-    cheque_prefix = models.CharField(max_length=20, default='CHQ')
+    shipment_prefix = models.CharField(max_length=20, default='SHIP', blank=True, null=True)
+    journal_voucher_prefix = models.CharField(max_length=20, default='JV', blank=True, null=True)
+    cash_transfer_prefix = models.CharField(max_length=20, default='CT', blank=True, null=True)
+    packages_prefix = models.CharField(max_length=20, default='PKG', blank=True, null=True)
+    bill_prefix = models.CharField(max_length=20, default='BILL', blank=True, null=True)
+    invoice_prefix = models.CharField(max_length=20, default='INV', blank=True, null=True)
+    credit_note_prefix = models.CharField(max_length=20, default='CN', blank=True, null=True)
+    cheque_prefix = models.CharField(max_length=20, default='CHQ', blank=True, null=True)
 
     def save(self, *args, **kwargs):
         if not self.pk and ShipmentPrefixes.objects.exists():
