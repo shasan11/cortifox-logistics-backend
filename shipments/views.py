@@ -21,6 +21,8 @@ from rest_framework_bulk.generics import BulkModelViewSet
 class ShipmentViewSet(BulkModelViewSet):
     queryset = Shipment.objects.all()
     serializer_class = ShipmentSerializer
+    filter_backends = [DjangoFilterBackend]   
+    filterset_fields = ['shipment_type','client','consignee','is_loaded','master']
 
     @action(detail=True, methods=['get'])
     def packages(self, request, pk=None):

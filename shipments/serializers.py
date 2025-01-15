@@ -24,24 +24,30 @@ class UserMinimalSerializer(BulkSerializerMixin,serializers.ModelSerializer):
 class PortSerializer(BulkSerializerMixin,serializers.ModelSerializer):
     class Meta:
         model = Ports
-        fields = ['id', 'name']
+        fields = ['id', 'name','country','city','symbol']
         list_serializer_class = AdaptedBulkListSerializer
 
 class ClientSerializer(BulkSerializerMixin,serializers.ModelSerializer):
     class Meta:
         model = Client
-        fields = ['id', 'name']
+        fields = ['id', 'name','country','email','phone']
         list_serializer_class = AdaptedBulkListSerializer
 
 class VendorSerializer(BulkSerializerMixin,serializers.ModelSerializer):
     class Meta:
         model = Vendor
-        fields = ['id', 'name']
+        fields = ['id', 'name','country','state','address','phone','email']
         list_serializer_class = AdaptedBulkListSerializer
 
 class RelatedConsigneeSerializer(BulkSerializerMixin,serializers.ModelSerializer):
     class Meta:
         model = RelatedConsignee
+        fields = "__all__"
+        list_serializer_class = AdaptedBulkListSerializer
+
+class ShipmentPartySerializer(BulkSerializerMixin,serializers.ModelSerializer):
+    class Meta:
+        model = ShipmentParty
         fields = "__all__"
         list_serializer_class = AdaptedBulkListSerializer
 
@@ -147,6 +153,7 @@ class ShipmentSerializer(BulkSerializerMixin,serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ['user_add', 'created', 'updated']
         list_serializer_class = AdaptedBulkListSerializer
+        depth=2
 
     def get_branch_details(self, obj):
         if obj.branch:

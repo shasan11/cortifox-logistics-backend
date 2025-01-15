@@ -195,7 +195,8 @@ class Shipment(models.Model):
     #Booking Shipment Specifice Field
     master= models.ForeignKey('self', related_name="subshipments", blank=True,null=True,on_delete=models.CASCADE)
     is_loaded=models.BooleanField(default=False)
-    booking_status=models.CharField(max_length=100,blank=True,null=True)    
+    booking_status=models.CharField(max_length=100,blank=True,null=True)   
+    additionalInfo=models.TextField(blank=True,null=True) 
 
 
 

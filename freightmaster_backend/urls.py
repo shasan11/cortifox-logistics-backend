@@ -1,5 +1,9 @@
 from django.contrib import admin
 from django.urls import path,include
+ 
+from rest_framework import permissions
+ 
+ 
 
 urlpatterns = [
     path('auth/',include("djoser.urls")),
@@ -16,5 +20,6 @@ urlpatterns = [
     path('sales/',include('sales.urls')),
     path('shipments/',include('shipments.urls')),
     path('warehouse/',include('warehouse.urls')),
-    path('docs-generator/',include('docsprovider.urls'))
+    path('docs-generator/',include('docsprovider.urls')),
+    
 ]

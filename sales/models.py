@@ -42,6 +42,7 @@ class Invoice(models.Model):
     status = models.CharField(max_length=20, choices=invoice_status,default='pending')
     client = models.ForeignKey(Clients, on_delete=models.PROTECT, related_name='invoices')
     currency = models.ForeignKey(Currency, on_delete=models.PROTECT, related_name='invoices')
+    master_shipment_reference_no=models.CharField(max_length=120,blank=True,null=True)
     discount_amount = models.DecimalField(max_digits=50, decimal_places=10)
     total_amount = models.DecimalField(max_digits=50, decimal_places=10)
     paid_amount = models.DecimalField(max_digits=50, decimal_places=10)
