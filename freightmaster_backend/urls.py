@@ -2,8 +2,6 @@ from django.contrib import admin
 from django.urls import path,include
  
 from rest_framework import permissions
- 
- 
 
 urlpatterns = [
     path('auth/',include("djoser.urls")),
