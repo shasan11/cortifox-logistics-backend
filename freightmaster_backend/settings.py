@@ -14,7 +14,7 @@ SECRET_KEY = 'django-insecure-d11)5fnm)^ign$9ff296am685r(h))k6kj$m!-8on0=&&cm1!)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['.vercel.app'] # Allow *.vercel.app
+ALLOWED_HOSTS = ['*'] # Allow *.vercel.app
 
 # Application definition
 
@@ -148,7 +148,7 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.AllowAny',
     ],
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend',

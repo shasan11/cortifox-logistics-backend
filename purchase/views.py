@@ -1,42 +1,74 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, filters
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.filters import OrderingFilter
-from .models import Costing, VendorPayment, VendorCreditDebitNote, Expense, NotesItem
-from .serializers import CostingSerializer, VendorPaymentSerializer, VendorCreditDebitNoteSerializer, ExpenseSerializer, NotesItemSerializer
-from .filters import CostingFilter, VendorPaymentFilter, VendorCreditDebitNoteFilter, ExpenseFilter, NotesItemFilter
+from rest_framework.permissions import IsAuthenticated
+from .serializers import (
+    ExpenseCategorySerializer,
+    ExpensesSerializer,
+    ExpensesItemsSerializer,
+    VendorBillsSerializer,
+    VendorBillItemsSerializer,
+    VendorPaymentsSerializer,
+    VendorPaymentEntriesSerializer,
+)
+from .models import ExpenseCategory, Expenses, ExpensesItems, VendorBills, VendorBillItems, VendorPayments, VendorPaymentEntries
 from rest_framework_bulk.generics import BulkModelViewSet
 
-class CostingViewSet(BulkModelViewSet):
-    queryset = Costing.objects.all()
-    serializer_class = CostingSerializer
-    filter_backends = [DjangoFilterBackend, OrderingFilter]
-    filterset_class = CostingFilter
-    ordering_fields = ['created', 'updated_date', 'total_amount']
 
-class VendorPaymentViewSet(BulkModelViewSet):
-    queryset = VendorPayment.objects.all()
-    serializer_class = VendorPaymentSerializer
-    filter_backends = [DjangoFilterBackend, OrderingFilter]
-    filterset_class = VendorPaymentFilter
-    ordering_fields = ['payment_date', 'amount']
+class ExpenseCategoryViewSet(BulkModelViewSet):
+    queryset = ExpenseCategory.objects.all()
+    serializer_class = ExpenseCategorySerializer
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['name', 'parent']
+    search_fields = ['name']
+    ordering_fields = ['id', 'name']
 
-class VendorCreditDebitNoteViewSet(BulkModelViewSet):
-    queryset = VendorCreditDebitNote.objects.all()
-    serializer_class = VendorCreditDebitNoteSerializer
-    filter_backends = [DjangoFilterBackend, OrderingFilter]
-    filterset_class = VendorCreditDebitNoteFilter
-    ordering_fields = ['created', 'amount']
 
-class ExpenseViewSet(BulkModelViewSet):
-    queryset = Expense.objects.all()
-    serializer_class = ExpenseSerializer
-    filter_backends = [DjangoFilterBackend, OrderingFilter]
-    filterset_class = ExpenseFilter
-    ordering_fields = ['date', 'subtotal', 'grand_total']
+class ExpensesViewSet(BulkModelViewSet):
+    queryset = Expenses.objects.all()
+    serializer_class = ExpensesSerializer
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['invoice_reference', 'supplier', 'date', 'currency']
+    search_fields = ['invoice_reference']
+    ordering_fields = ['date', 'due_date', 'total_amount']
 
-class NotesItemViewSet(BulkModelViewSet):
-    queryset = NotesItem.objects.all()
-    serializer_class = NotesItemSerializer
-    filter_backends = [DjangoFilterBackend, OrderingFilter]
-    filterset_class = NotesItemFilter
-    ordering_fields = ['amount', 'qty', 'tax_percent']
+
+class ExpensesItemsViewSet(BulkModelViewSet):
+    queryset = ExpensesItems.objects.all()
+    serializer_class = ExpensesItemsSerializer
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['expensesitems', 'vat_choices']
+    ordering_fields = ['amount']
+
+
+class VendorBillsViewSet(BulkModelViewSet):
+    queryset = VendorBills.objects.all()
+    serializer_class = VendorBillsSerializer
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['vendor', 'date', 'due_date', 'bill_status']
+    search_fields = ['invoice_reference']
+    ordering_fields = ['date', 'due_date', 'total_amount']
+
+
+class VendorBillItemsViewSet(BulkModelViewSet):
+    queryset = VendorBillItems.objects.all()
+    serializer_class = VendorBillItemsSerializer
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['vendorbills', 'vat_choices']
+    ordering_fields = ['rate', 'qty', 'total']
+
+
+class VendorPaymentsViewSet(BulkModelViewSet):
+    queryset = VendorPayments.objects.all()
+    serializer_class = VendorPaymentsSerializer
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['paid_from', 'paid_to', 'date', 'bill_status']
+    search_fields = ['remarks']
+    ordering_fields = ['date', 'amount']
+
+
+class VendorPaymentEntriesViewSet(BulkModelViewSet):
+    queryset = VendorPaymentEntries.objects.all()
+    serializer_class = VendorPaymentEntriesSerializer
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['vendor_payments', 'vendor_bills']
+    ordering_fields = ['amount']
